@@ -10,5 +10,8 @@ from skimage.exposure import histogram
 from skimage.measure import find_contours
 from skimage.draw import rectangle, line
 from skimage.transform import rotate
-image=pp.preprocessimage('testimgs/stress/4.jpg')
+
+orimage=io.imread('testimgs/stress/1.jpg')
+io.imshow(orimage)
+image=pp.preprocessimage('testimgs/stress/2.jpg')
 io.imshow(image)
