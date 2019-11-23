@@ -4,13 +4,10 @@ no skwed images .
 if not can i use get prespective transformation from open cv ? .
 
 ## *Mokhtar*
-#### Digits Localization 
-- find_contours function is allowed ?
-
+- find_contours function is allowed for digits Localization?
 - Maximum digits count in each cell ?
-#### Digits Localization
 - Floating Points are included ? 
-- Can we use CNN for accuercy ? # for Digits identification
+- Can we use CNN for accuercy ? for digits identification
 - Can i use multiple models to recognize the numbers then find the most frequent output ?
 -
 
