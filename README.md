@@ -5,13 +5,17 @@
 ### Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
+### Requirements
 What things you need to install the software and how to install them
+  - skimage
+  - pytesseract 
+  - tensorflow
+  - keras
+  - opencv
 
 
 ### Installing
-Set instructions here
-
+  
 ### Module 1 (Grades sheet)
 1- Digit Classifier 
   - Digits Localization
