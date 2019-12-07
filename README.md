@@ -13,13 +13,18 @@ What things you need to install the software and how to install them
 Set instructions here
 
 ### Module 1 (Grades sheet)
-Explain what you have did exactly.
+1- Digit Classifier 
+  - Digits Localization
+    - Finding Contours 
+  - Digits Recoginition 
+    - OCR
+    - HOG Classifier
 
 ### Module 2 (Bubble sheet correction)
 Explain what you have did exactly.
 
 ### Authors
-- @setgethubuser here
+- [@MOKHTAR](https://github.com/mohamed-mokhtar)
 - @setgethubuser here
 
 ### Acknowledgments
