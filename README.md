@@ -14,8 +14,6 @@ What things you need to install ?
   - opencv
 
 
-### Installing
-  
 ### Module 1 (Grades sheet)
 1- Digit Classifier 
   - Digits Localization
