@@ -1,8 +1,1 @@
-1-
-can i assume that the paper is taken from top view ?
-no skwed images .
-if not can i use get prespective transformation from open cv ?
-.
 
-2-for the bubble sheet module will it be a photo taken from a 
-    camera also or it will be alrady documented ?
