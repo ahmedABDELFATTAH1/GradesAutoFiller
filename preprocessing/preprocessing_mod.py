@@ -10,7 +10,7 @@ from skimage.measure import find_contours
 from skimage.transform import rotate
 from skimage.filters import threshold_local,median
 from skimage.transform import hough_line, hough_line_peaks
-from excellpre import preprocessing,returncell
+from preprocessing.excellpre import preprocessing,returncell
 from skimage.morphology import skeletonize
 
 def intersection(line1, line2):  
@@ -122,14 +122,7 @@ def deskewImage(path):
     cv2.destroyAllWindows()
     return deskewedimage 
  
-if __name__=='__main__':
-    grayimage=deskewImage('excelpic/1.jpg') 
-    X_lines,Y_lines=preprocessing(grayimage)
-    cell=returncell(5,8,X_lines,Y_lines,grayimage)
-    cv2.imshow('img',cell)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    
+
     
 
     

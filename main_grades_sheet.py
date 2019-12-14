@@ -10,12 +10,17 @@ from skimage.exposure import histogram
 from skimage.measure import find_contours
 from skimage.draw import rectangle, line
 from skimage.transform import rotate
-from preprocessing.excellpre import *
+from preprocessing.preprocessing_mod import *
 
-rowscells=preprocessing('excelpic/8.jpg')
 
-cv2.imshow('img',rowscells[5][7])
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+
+if __name__=='__main__':        
+    grayimage=deskewImage('excelpic/1.jpg') 
+    X_lines,Y_lines=preprocessing(grayimage)
+    cell=returncell(8,9,X_lines,Y_lines,grayimage)
+    cv2.imshow('img',cell)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
 
     
