@@ -41,8 +41,8 @@ def detectHlines(binimage):
     for i in range(0,binimage.shape[0],1):
         sliceimage=binimage[i,:]        
         sumones=np.sum(sliceimage)        
-        if sumones>50000 and np.abs(i-iprev)>15:
-            Xlines.append(i+1)
+        if sumones>20000 and np.abs(i-iprev)>15:
+            Xlines.append(i+5)
             iprev=i        
     return Xlines
 
@@ -52,8 +52,8 @@ def detectVlines(binimage):
     for i in range(0,binimage.shape[1]-2,2):
         sliceimage=binimage[:,i:i+2]        
         sumones=np.sum(sliceimage )
-        if sumones>50000 and np.abs(i-iprev)>30:
-            ylines.append(i+2)
+        if sumones>50000 and np.abs(i-iprev)>10:
+            ylines.append(i+5)
             iprev=i
     return ylines
 

@@ -45,16 +45,14 @@ def deskewImage(path):
     xlines=[]
     ylines=[]
     lines=cv2.HoughLines(edge_gray_scale_image,1,np.pi/180,200) 
-    
+        
     for line in lines:    
         rho,theta = line[0]  
         angle=((theta*180)/np.pi)+180
         if (angle > 80 and angle < 100) or (angle> 260 and angle <280): 
             xlines.append([rho,theta])             
         elif (angle > 320) or(angle < 20) or (angle <200 and angle >160):
-            ylines.append([rho,theta])      
-            
-    
+            ylines.append([rho,theta])  
     xlines=sorted(xlines,key=lambda l:l[0])  
     threshodlinex=5
     while(1):        
@@ -70,7 +68,7 @@ def deskewImage(path):
                 filteredxlines.append(line)
                 prev_rho_x=rho
         print(len(filteredxlines))            
-        if len(filteredxlines)>= 35 and  len(filteredxlines)<=42:
+        if len(filteredxlines)>= 34 and  len(filteredxlines)<=45:
             break
         elif len(filteredxlines)<35:
             threshodlinex-=1
@@ -92,9 +90,12 @@ def deskewImage(path):
             
     leftline=[10000,30]
     rightline=filteredylines[1]
-    for line in filteredylines:
-        if(line[0]>0 and line[0]<leftline[0]):
-            leftline=line
+    index=-1
+    for i in range(len(filteredylines)):
+        if(filteredylines[i][0]>0 and filteredylines[i][0]<leftline[0]):
+            leftline=filteredylines[i]
+            index=i
+          
     
     upline=filteredxlines[0]
     downline=filteredxlines[len(filteredxlines)-1] 

@@ -15,10 +15,12 @@ from preprocessing.preprocessing_mod import *
 
 
 if __name__=='__main__':        
-    grayimage=deskewImage('excelpic/1.jpg') 
+    grayimage=deskewImage('excelpic/16.jpg') 
+    th3 = cv2.adaptiveThreshold(grayimage,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
     X_lines,Y_lines=preprocessing(grayimage)
-    cell=returncell(8,9,X_lines,Y_lines,grayimage)
-    cv2.imshow('img',cell)
+    cell=returncell(32,5,X_lines,Y_lines,th3)
+    newcell=cv2.medianBlur(cell,3)
+    cv2.imshow('img',newcell)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     
