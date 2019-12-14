@@ -119,8 +119,7 @@ def deskewImage(path):
     	# compute the perspective transform matrix and then apply it
     M=cv2.getPerspectiveTransform(rect, dst)
     deskewedimage = cv2.warpPerspective(img_rotation, M, (width, height)) 
-    return deskewedimage
- 
+    return deskewedimage 
  
 if __name__=='__main__':
     deskewImage('the path you want')
