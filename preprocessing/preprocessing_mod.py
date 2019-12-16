@@ -12,123 +12,176 @@ from skimage.filters import threshold_local,median
 from skimage.transform import hough_line, hough_line_peaks
 from preprocessing.excellpre import preprocessing,returncell
 from skimage.morphology import skeletonize
+import imutils
 
-def intersection(line1, line2):  
-    rho1, theta1 = line1   
-    rho2, theta2 = line2   
-    A = np.array([
-        [np.cos(theta1), np.sin(theta1)],
-        [np.cos(theta2), np.sin(theta2)]
-    ])
-    b = np.array([[rho1], [rho2]])
-    x0, y0 = np.linalg.solve(A, b)
-    x0, y0 = int(np.round(x0)), int(np.round(y0))
-    return [x0, y0]
-
-def deskewImage(path):    
+def excelpreprocessing(path):
     colorimage= cv2.imread(path)
     gray_scale_image=cv2.cvtColor(colorimage,cv2.COLOR_BGR2GRAY)
     edge_gray_scale_image =cv2.Canny(gray_scale_image,100,150)
-    H, theta, d = hough_line(edge_gray_scale_image)
-    _,angles,distance=hough_line_peaks(H,theta,d,num_peaks=1)
-    angle=int(angles[0]*180/np.pi)
-    rotation_matrix = cv2.getRotationMatrix2D((gray_scale_image.shape[1]/2,gray_scale_image.shape[0]/2), angle, 1)
-    img_rotation = cv2.warpAffine(gray_scale_image, rotation_matrix, (gray_scale_image.shape[1], gray_scale_image.shape[0]))
-    colorimage=cv2.warpAffine(colorimage, rotation_matrix, (gray_scale_image.shape[1], gray_scale_image.shape[0]))
-    edge_gray_scale_image =cv2.Canny(img_rotation,100,150)
-    
-    
     cv2.imshow('img',edge_gray_scale_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    
-    xlines=[]
-    ylines=[]
-    lines=cv2.HoughLines(edge_gray_scale_image,1,np.pi/180,200) 
-        
-    for line in lines:    
-        rho,theta = line[0]  
-        angle=((theta*180)/np.pi)+180
-        if (angle > 80 and angle < 100) or (angle> 260 and angle <280): 
-            xlines.append([rho,theta])             
-        elif (angle > 320) or(angle < 20) or (angle <200 and angle >160):
-            ylines.append([rho,theta])  
-    xlines=sorted(xlines,key=lambda l:l[0])  
-    threshodlinex=5
-    while(1):        
-        filteredxlines=[]     
-        prev_rho_x =100000
-        print(len(filteredxlines))
-        for line in xlines:
-            rho=line[0]        
-            if rho-prev_rho_x <threshodlinex:
-                prev_rho_x=rho
-                continue
-            else:
-                filteredxlines.append(line)
-                prev_rho_x=rho
-        print(len(filteredxlines))            
-        if len(filteredxlines)>= 34 and  len(filteredxlines)<=45:
-            break
-        elif len(filteredxlines)<35:
-            threshodlinex-=1
-        else:
-            threshodlinex+=1
-            
-    ylines=sorted(ylines,key=lambda l:l[0])  
-    threshodliney=20      
-    filteredylines=[]     
-    prev_rho_y =100000
-    for line in ylines:
-        rho=line[0]   
-        if np.abs(prev_rho_y-rho) <threshodliney:
-            prev_rho_y=rho
-            continue
-        else:
-            filteredylines.append(line)
-            prev_rho_y=rho
-            
-    leftline=[10000,30]
-    rightline=filteredylines[1]
-    index=-1
-    for i in range(len(filteredylines)):
-        if(filteredylines[i][0]>0 and filteredylines[i][0]<leftline[0]):
-            leftline=filteredylines[i]
-            index=i
-          
-    
-    upline=filteredxlines[0]
-    downline=filteredxlines[len(filteredxlines)-1] 
-    pointupleft=intersection(upline,leftline)
-    pointdownleft=intersection(downline,leftline)
-    pointupright=intersection(upline,rightline)
-    pointdownright=intersection(downline,rightline)  
-    print(pointupleft)       
-    width=img_rotation.shape[1]
-    print(width)
-    height=img_rotation.shape[0]
-    rect=np.array([
-                pointupleft,pointupright,pointdownright,pointdownleft
-                ],dtype = "float32")
-    dst = np.array([
-    		[0, 0],
-    		[width-1, 0],
-    		[width-1, height - 1],
-    		[0, height - 1]], dtype = "float32") 
-    	# compute the perspective transform matrix and then apply it
-    M=cv2.getPerspectiveTransform(rect, dst)
-    deskewedimage = cv2.warpPerspective(img_rotation, M, (width, height)) 
-    cv2.imshow('img',deskewedimage)
+    th2 = cv2.adaptiveThreshold(gray_scale_image,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
+                cv2.THRESH_BINARY,11,4)         
+    edge_gray_scale_image=cv2.medianBlur(edge_gray_scale_image,3)
+    cv2.imshow('img',edge_gray_scale_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    return deskewedimage 
- 
+           
+    kernalx=np.ones((1,6))
+    imagex=cv2.morphologyEx(edge_gray_scale_image, cv2.MORPH_OPEN, kernalx)
+    kernalx=np.ones((1,20))
+    imagex=cv2.morphologyEx(imagex, cv2.MORPH_CLOSE, kernalx)
+    
+    
+    cv2.imshow('img',imagex)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
+    
+    kernaly=np.ones((7,1))
+    imagey=cv2.morphologyEx(edge_gray_scale_image, cv2.MORPH_OPEN, kernaly)
+    kernaly=np.ones((20,1))
+    imagey=cv2.morphologyEx(imagey, cv2.MORPH_CLOSE, kernaly)
+    
+    
+    cv2.imshow('img',imagey)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
+    binaryimage = cv2.bitwise_or(imagey, imagex, mask = None) 
+    
+    
+    
+    
+    
+    cv2.imshow('img',binaryimage)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
+    lines = cv2.HoughLines(binaryimage, 1, np.pi / 180, 150)
+    
+    newlines=[]
+    for line in lines:
+        rho,theta = line[0]
+        if rho <0 and theta<0:
+            rho=np.abs(rho) 
+            theta=theta+np.pi
+        newlines.append([rho,theta])
+        
+    import operator
+    newlines = sorted(newlines, key=operator.itemgetter(0, 1))
+    
+    for i in range(len(newlines)-1):
+        if np.abs(newlines[i][0]-newlines[i+1][0])<15 and np.abs(newlines[i][1]-newlines[i+1][1])<.022:
+            linerho=(newlines[i][0]+newlines[i+1][0])/2
+            linetheta=(newlines[i][1]+newlines[i+1][1])/2
+            newlines[i][0]=linerho
+            newlines[i+1][0]=linerho
+            newlines[i][1]=linetheta
+            newlines[i+1][1]=linetheta
+    
+    
+    binaryimage=cv2.bitwise_not(binaryimage)
+    
+    
+    for line in newlines:
+        rho,theta = line
+        if rho <0:
+            rho=np.abs(rho) 
+            theta=theta+np.pi             
+        a = np.cos(theta)
+        b = np.sin(theta)
+        x0 = a * rho
+        y0 = b * rho
+        # x1 stores the rounded off value of (r * cos(theta) - 1000 * sin(theta))
+        x1 = int(x0 + 1000 * (-b))
+        # y1 stores the rounded off value of (r * sin(theta)+ 1000 * cos(theta))
+        y1 = int(y0 + 1000 * (a))
+        # x2 stores the rounded off value of (r * cos(theta)+ 1000 * sin(theta))
+        x2 = int(x0 - 1000 * (-b))
+        # y2 stores the rounded off value of (r * sin(theta)- 1000 * cos(theta))
+        y2 = int(y0 - 1000 * (a))
+        cv2.line(binaryimage, (x1, y1), (x2, y2), (0, 0, 0), 2)
+    
+    
+    
+    cv2.imshow('image', binaryimage)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
+    
+    binaryimage=cv2.bitwise_not(binaryimage)
+    
+    
+    
+    cv2.imshow('img',binaryimage)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+         
+    binaryimage=binaryimage/255
+    
+    contours=find_contours(binaryimage,.8)
+    
+    
+    allcells=[]
+    for cont in contours:
+        xup=int(np.min(cont[:,0]))
+        xdown=int(np.max(cont[:,0]))
+        yleft=int(np.min(cont[:,1]))
+        yright=int(np.max(cont[:,1]))
+        width=yright-yleft
+        height=xdown-xup
+        if(width>20 and width<60 and height >10 ):
+            cell=th2[xup+1:xdown-1,yleft+1:yright-1]          
+            allcells.append([cell,xup,yleft])
+    rowscells=[]
+    index=-1
+    prev_xup=-10000
+    for cellinfo in allcells:
+        xup=cellinfo[1]
+        if xup-prev_xup>3:
+            rowscells.append([cellinfo])      
+            prev_xup=xup
+            index+=1
+        else:
+            rowscells[index].append(cellinfo)
+            prev_xup=xup    
+    
+    newrowscells=[]
+    for row in rowscells:
+        if len(row) < 5:
+            continue
+        sortedrow=sorted(row,key=lambda x: x[2],reverse=True)
+        newrowscells.append(sortedrow)
+    return newrowscells
 
+def extraxctidname(path):
+    colorimage= cv2.imread(path)
+    gray_scale_image=cv2.cvtColor(colorimage,cv2.COLOR_BGR2GRAY)
+    edge_gray_scale_image =cv2.Canny(gray_scale_image,100,150)
+    cv2.imshow('img',gray_scale_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     
+    
+    contours=find_contours(edge_gray_scale_image,.8)
+    
+    nameid=[]
+    for cont in contours:
+        xup=int(np.min(cont[:,0]))
+        xdown=int(np.max(cont[:,0]))
+        yleft=int(np.min(cont[:,1]))
+        yright=int(np.max(cont[:,1]))
+        width=yright-yleft
+        height=xdown-xup
+        if width/height>6 and width/height <6.5:
+            print(width/height)
+            nameid.append([xup,xdown,yleft,yright])
+    
+    if nameid[0][2] < nameid[1][2]:
+        return gray_scale_image[nameid[0][0]:nameid[0][1],nameid[0][2]:nameid[0][3]],gray_scale_image[nameid[1][0]:nameid[1][1],nameid[1][2]:nameid[1][3]]
+    else:
+        return gray_scale_image[nameid[1][0]:nameid[1][1],nameid[1][2]:nameid[1][3]],gray_scale_image[nameid[0][0]:nameid[0][1],nameid[0][2]:nameid[0][3]]
+        
 
-    
-    
-    
-    
-    
-    
