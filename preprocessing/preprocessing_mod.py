@@ -16,13 +16,19 @@ import imutils
 
 def excelpreprocessing(path):
     colorimage= cv2.imread(path)
-    gray_scale_image=cv2.cvtColor(colorimage,cv2.COLOR_BGR2GRAY)
+    gray_scale_image=cv2.cvtColor(colorimage,cv2.COLOR_BGR2GRAY)   
     edge_gray_scale_image =cv2.Canny(gray_scale_image,100,150)
-    cv2.imshow('img',edge_gray_scale_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    width = 720
+    height = 960
+    ratiowidth=colorimage.shape[1]/width
+    ratioheight=colorimage.shape[0]/height
+    if ratiowidth > 1.5 and ratioheight > 1.5:
+        dim = (width, height)    
+        resized = cv2.resize(gray_scale_image, dim, interpolation = cv2.INTER_NEAREST)
+        edge_gray_scale_image =cv2.Canny(resized,100,150)
+        print(ratiowidth,ratioheight)    
     th2 = cv2.adaptiveThreshold(gray_scale_image,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
-                cv2.THRESH_BINARY,11,4)         
+                cv2.THRESH_BINARY,11,2)         
     edge_gray_scale_image=cv2.medianBlur(edge_gray_scale_image,3)
     cv2.imshow('img',edge_gray_scale_image)
     cv2.waitKey(0)
@@ -51,10 +57,7 @@ def excelpreprocessing(path):
     
     binaryimage = cv2.bitwise_or(imagey, imagex, mask = None) 
     
-    
-    
-    
-    
+  
     cv2.imshow('img',binaryimage)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -133,7 +136,7 @@ def excelpreprocessing(path):
         width=yright-yleft
         height=xdown-xup
         if(width>20 and width<60 and height >10 ):
-            cell=th2[xup+1:xdown-1,yleft+1:yright-1]          
+            cell=th2[int(xup*ratioheight):int(xdown*ratioheight),int(yleft*ratiowidth):int(yright*ratiowidth)]          
             allcells.append([cell,xup,yleft])
     rowscells=[]
     index=-1
@@ -148,12 +151,15 @@ def excelpreprocessing(path):
             rowscells[index].append(cellinfo)
             prev_xup=xup    
     
-    newrowscells=[]
-    for row in rowscells:
+    newrowscells=[]  
+    index=0
+    for row in rowscells:        
         if len(row) < 5:
-            continue
+            continue              
+        newrowscells.append([])
         sortedrow=sorted(row,key=lambda x: x[2],reverse=True)
-        newrowscells.append(sortedrow)
+        newrowscells[index]=sortedrow        
+        index+=1
     return newrowscells
 
 def extraxctidname(path):
@@ -184,4 +190,7 @@ def extraxctidname(path):
     else:
         return gray_scale_image[nameid[1][0]:nameid[1][1],nameid[1][2]:nameid[1][3]],gray_scale_image[nameid[0][0]:nameid[0][1],nameid[0][2]:nameid[0][3]]
         
+
+            
+
 
