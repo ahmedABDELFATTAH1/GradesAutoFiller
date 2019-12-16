@@ -14,15 +14,22 @@ from preprocessing.preprocessing_mod import *
 
 
 
-if __name__=='__main__':        
-    grayimage=deskewImage('excelpic/16.jpg') 
-    th3 = cv2.adaptiveThreshold(grayimage,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-    X_lines,Y_lines=preprocessing(grayimage)
-    cell=returncell(32,5,X_lines,Y_lines,th3)
-    newcell=cv2.medianBlur(cell,3)
-    cv2.imshow('img',newcell)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+if __name__=='__main__': 
+    rowscells=excelpreprocessing('image/333.jpg')
+    for row in rowscells:
+        for cellinfo in row:
+            cell=cellinfo[0]
+            cell=cv2.bitwise_not(cell)
+            kernalx=np.ones((3,3))
+            erosion = cv2.erode(cell,kernalx,iterations = 1)
+            cell=cv2.bitwise_not(cell)
+            cv2.imshow('img',erosion)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+    
+            
+    
+    
     
 
     
